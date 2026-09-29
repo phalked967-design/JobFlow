@@ -1,26 +1,23 @@
 # Python
 __pycache__/
 *.py[cod]
-.venv/
-venv/
+*.pyo
+*.pyd
+
+# Virtual environment
+backend/.venv/
+
+# SQLite database
+backend/jobflow.db
+
+# Environment variables
 .env
-
-# Node
-node_modules/
-dist/
-build/
-
-# Environment
-.env.local
-.env.*.local
+.env.*
 
 # IDE
 .vscode/
 .idea/
 
 # OS
-.DS_Store
 Thumbs.db
-
-# Logs
-*.log
+.DS_Store

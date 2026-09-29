@@ -2,99 +2,95 @@
 
 
 
-JobFlow is a full-stack job application tracking platform designed to help job seekers manage and analyze their job applications from one place.
+JobFlow is a web-based job application tracker built to help users organize and manage job opportunities in one place.
 
 
 
-\## Project Status
+\## Features
 
 
 
-🚧 Under Development
+\- Add job opportunities
+
+\- View saved jobs
+
+\- Update application status
+
+\- View individual job records
+
+\- Delete jobs
+
+\- REST API using FastAPI
+
+\- SQLite database
+
+\- Interactive API documentation with Swagger
+
+\- Simple HTML/CSS/JavaScript frontend
 
 
 
-\## Planned Features
+\## Tech Stack
 
 
-
-\- User registration and login
-
-\- Job application tracking
-
-\- Application status management
-
-\- Interview tracking
-
-\- Company and recruiter information
-
-\- Search and filtering
-
-\- Application analytics dashboard
-
-\- Resume management
-
-\- Notes and reminders
-
-
-
-\## Planned Technology Stack
-
-
-
-\### Frontend
-
-\- React
-
-\- TypeScript
-
-
-
-\### Backend
 
 \- Python
 
 \- FastAPI
 
+\- Uvicorn
 
+\- SQLAlchemy
 
-\### Database
+\- SQLite
 
-\- PostgreSQL
+\- Pydantic
 
-\- SQL
+\- HTML
 
+\- CSS
 
-
-\### Development Tools
-
-\- Git
-
-\- GitHub
-
-\- Postman
-
-\- Docker
-
-\- GitHub Actions
+\- JavaScript
 
 
 
-\## Project Goal
+\## Project Structure
 
 
 
-The goal of JobFlow is to build a practical, production-style full-stack application while demonstrating software engineering, frontend, backend, database, API, testing, and deployment skills.
+```text
 
+JobFlow/
 
+├── frontend/
 
-\## Architecture
+│   └── index.html
 
+├── backend/
 
+│   ├── app/
 
-Frontend → Backend API → Database
+│   │   ├── \_\_init\_\_.py
 
+│   │   ├── main.py
 
+│   │   ├── database.py
 
-More detailed architecture and implementation documentation will be added as the project develops.
+│   │   ├── models.py
+
+│   │   ├── schemas.py
+
+│   │   ├── routes.py
+
+│   │   └── init\_db.py
+
+│   ├── requirements.txt
+
+│   └── jobflow.db
+
+├── docs/
+
+├── .gitignore
+
+└── README.md
 

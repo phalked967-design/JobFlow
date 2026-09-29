@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobFlow</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            color: #222;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+        }
+
+        input,
+        textarea,
+        select,
+        button {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            background: #222;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .job {
+            border: 1px solid #ddd;
+            padding: 18px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .job h3 {
+            margin-bottom: 5px;
+        }
+
+        .job p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .delete {
+            background: #b42318;
+        }
+
+        .status {
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .empty {
+            color: #777;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>JobFlow</h1>
+    <p class="subtitle">Job Application Tracker</p>
+
+    <div class="card">
+        <h2>Add Job</h2>
+        <br>
+
+        <form id="jobForm">
+
+            <input
+                type="text"
+                id="title"
+                placeholder="Job title"
+                required
+            >
+
+            <input
+                type="text"
+                id="company"
+                placeholder="Company"
+                required
+            >
+
+            <input
+                type="text"
+                id="location"
+                placeholder="Location"
+            >
+
+            <input
+                type="text"
+                id="job_type"
+                placeholder="Job type (Internship / Full-time)"
+            >
+
+            <textarea
+                id="description"
+                placeholder="Job description"
+            ></textarea>
+
+            <input
+                type="url"
+                id="application_url"
+                placeholder="Application URL"
+            >
+
+            <select id="status">
+                <option value="saved">Saved</option>
+                <option value="applied">Applied</option>
+                <option value="interview">Interview</option>
+                <option value="rejected">Rejected</option>
+                <option value="selected">Selected</option>
+            </select>
+
+            <button type="submit">Add Job</button>
+
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Your Jobs</h2>
+        <div id="jobsList"></div>
+    </div>
+
+</div>
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000/jobs/";
+
+const jobForm = document.getElementById("jobForm");
+const jobsList = document.getElementById("jobsList");
+
+
+async function loadJobs() {
+
+    const response = await fetch(API_URL);
+    const jobs = await response.json();
+
+    jobsList.innerHTML = "";
+
+    if (jobs.length === 0) {
+        jobsList.innerHTML = '<div class="empty">No jobs added yet.</div>';
+        return;
+    }
+
+    jobs.forEach(job => {
+
+        const div = document.createElement("div");
+        div.className = "job";
+
+        div.innerHTML = `
+            <h3>${job.title}</h3>
+            <p><strong>Company:</strong> ${job.company}</p>
+            <p><strong>Location:</strong> ${job.location || "Not specified"}</p>
+            <p><strong>Type:</strong> ${job.job_type || "Not specified"}</p>
+            <p><strong>Description:</strong> ${job.description || "No description"}</p>
+            <p>
+                <strong>Status:</strong>
+                <span class="status">${job.status}</span>
+            </p>
+
+            ${
+                job.application_url
+                ? `<p><a href="${job.application_url}" target="_blank">Open Application</a></p>`
+                : ""
+            }
+
+            <div class="actions">
+
+                <select onchange="updateStatus(${job.id}, this.value)">
+                    <option value="saved" ${job.status === "saved" ? "selected" : ""}>Saved</option>
+                    <option value="applied" ${job.status === "applied" ? "selected" : ""}>Applied</option>
+                    <option value="interview" ${job.status === "interview" ? "selected" : ""}>Interview</option>
+                    <option value="rejected" ${job.status === "rejected" ? "selected" : ""}>Rejected</option>
+                    <option value="selected" ${job.status === "selected" ? "selected" : ""}>Selected</option>
+                </select>
+
+                <button class="delete" onclick="deleteJob(${job.id})">
+                    Delete
+                </button>
+
+            </div>
+        `;
+
+        jobsList.appendChild(div);
+    });
+}
+
+
+jobForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const job = {
+
+        title: document.getElementById("title").value,
+        company: document.getElementById("company").value,
+        location: document.getElementById("location").value,
+        job_type: document.getElementById("job_type").value,
+        description: document.getElementById("description").value,
+        application_url: document.getElementById("application_url").value,
+        status: document.getElementById("status").value
+
+    };
+
+    const response = await fetch(API_URL, {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(job)
+
+    });
+
+    if (response.ok) {
+
+        jobForm.reset();
+
+        loadJobs();
+
+    } else {
+
+        alert("Failed to add job.");
+
+    }
+
+});
+
+
+async function updateStatus(id, status) {
+
+    const response = await fetch(`${API_URL}${id}`);
+
+    if (!response.ok) {
+        alert("Job not found.");
+        return;
+    }
+
+    const job = await response.json();
+
+    job.status = status;
+
+    delete job.id;
+
+    await fetch(`${API_URL}${id}`, {
+
+        method: "PUT",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(job)
+
+    });
+
+    loadJobs();
+}
+
+
+async function deleteJob(id) {
+
+    const confirmed = confirm("Delete this job?");
+
+    if (!confirmed) {
+        return;
+    }
+
+    await fetch(`${API_URL}${id}`, {
+        method: "DELETE"
+    });
+
+    loadJobs();
+}
+
+
+loadJobs();
+
+</script>
+
+</body>
+</html>
